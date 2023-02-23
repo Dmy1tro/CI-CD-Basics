@@ -36,7 +36,7 @@ jobs:
           ${{ runner.os }}-nuget-
 
     - name: Build
-      run: dotnet build ./Weather.sln --configuration Release
+      run: dotnet build --configuration Release
 
     #- name: Test
     # run: dotnet test --no-build --verbosity normal
