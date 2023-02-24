@@ -49,7 +49,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: .net-app
-        path: "./home/runner/work/CI-CD-Basics/CI-CD-Basics/Weather/bin/Release/net6.0/publish"
+        path: "/home/runner/work/CI-CD-Basics/CI-CD-Basics/Weather/bin/Release/net6.0/publish"
 
   deploy:
       runs-on: ubuntu-latest
