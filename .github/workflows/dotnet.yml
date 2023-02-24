@@ -13,7 +13,7 @@ on:
     branches: [ "master" ]
 
 env:
-  AZURE_WEBAPP_NAME: "weather-api"
+  AZURE_WEBAPP_NAME: "Weather-api-12345"
   AZURE_WEBAPP_PUBLISH_PATH: '.'
 
 jobs:
