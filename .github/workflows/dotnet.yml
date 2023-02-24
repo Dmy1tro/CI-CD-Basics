@@ -2,6 +2,7 @@
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
 # https://docs.github.com/en/actions/deployment/deploying-to-your-cloud-provider/deploying-to-azure/deploying-net-to-azure-app-service
+# https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish
 
 name: Publish Weather API!
 
@@ -13,7 +14,7 @@ on:
 
 env:
   AZURE_WEBAPP_NAME: "weather-api"
-  AZURE_WEBAPP_PUBLISH_PATH: "./bin/Release/net6.0/publish"
+  AZURE_WEBAPP_PUBLISH_PATH: ${{ env.DOTNET_ROOT }}/bin/Release/net6.0/publish
 
 jobs:
   build:
