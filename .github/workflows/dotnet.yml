@@ -3,7 +3,6 @@
 
 # https://docs.github.com/en/actions/deployment/deploying-to-your-cloud-provider/deploying-to-azure/deploying-net-to-azure-app-service
 # https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish
-# 123
 
 name: Publish Weather API
 
@@ -44,7 +43,7 @@ jobs:
     # run: dotnet test --no-build --verbosity normal
       
     - name: Publish
-      run: dotnet publish --configuration Release --no-build --no-restore --output "./publish"
+      run: dotnet publish --configuration Release --output "./publish"
       
     - name: Upload artifact for deployment job
       uses: actions/upload-artifact@v3
