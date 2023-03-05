@@ -36,7 +36,7 @@ jobs:
       run: dotnet test Weather.Domain.Tests/Weather.Domain.Tests.csproj --verbosity normal
       
     - name: Publish
-      run: dotnet publish Weather/Weather.csproj --configuration Release --output "./publish_artifacts"
+      run: dotnet publish Weather/Weather.csproj --configuration Release --output "publish_artifacts"
       
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3
