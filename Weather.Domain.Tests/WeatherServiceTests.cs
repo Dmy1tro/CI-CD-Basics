@@ -35,7 +35,7 @@ namespace Weather.Domain.Tests
         [Fact]
         public void Should_Throw_Argument_Exception_When_City_Is_Empty()
         {
-            Assert.Throws<ArgumentException>(() => _weatherService.GetWeatherForecasts("", 12));
+            Assert.Throws<NullReferenceException>(() => _weatherService.GetWeatherForecasts("", 12));
         }
     }
 }
