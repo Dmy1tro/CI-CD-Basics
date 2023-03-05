@@ -1,9 +1,9 @@
 
 # https://docs.github.com/en/actions/deployment/deploying-to-your-cloud-provider/deploying-to-azure/deploying-net-to-azure-app-service
-# https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish
 # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+# https://learn.microsoft.com/en-us/dotnet/architecture/devops-for-aspnet-developers/actions-build
 
-name: Publish & Deploy Weather API
+name: Test & Build & Deploy Weather API
 
 on:
   push:
@@ -41,16 +41,12 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
-
     - name: Restore dependencies
       run: dotnet restore
-
     - name: Build
       run: dotnet build --configuration Release --no-restore
-
     - name: Publish
       run: dotnet publish Weather/Weather.csproj --configuration Release --output "Weather/publish_artifacts"
-      
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3
       with:
@@ -64,14 +60,12 @@ jobs:
       environment:
         name: 'production'
         url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
       steps:
         - name: Download a Build Artifact
           uses: actions/download-artifact@v3
           with:
             name: weather-api
             path: weather-api
-
         - name: Deploy to Azure
           id: deploy-to-azure
           uses: azure/webapps-deploy@v2
