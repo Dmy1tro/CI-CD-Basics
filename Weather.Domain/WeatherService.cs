@@ -11,7 +11,7 @@
         {
             if (days < 1)
             {
-                throw new ArgumentException("days should be greater or equal than 1");
+                throw new ArgumentException("Days should be greater or equal than 1");
             }
 
             var forecast = Enumerable.Range(1, days)
@@ -24,6 +24,16 @@
                 .ToArray();
 
             return forecast;
+        }
+
+        public IReadOnlyCollection<WeatherForecast> GetWeatherForecasts(string city, int days)
+        {
+            if (string.IsNullOrEmpty(city))
+            {
+                throw new ArgumentException("City should not be empty.");
+            }
+
+            return GetWeatherForecasts(days);
         }
     }
 }
