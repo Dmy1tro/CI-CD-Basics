@@ -30,8 +30,23 @@ jobs:
     - name: Run tests
       run: dotnet test Weather.Domain.Tests/Weather.Domain.Tests.csproj --configuration Release --no-build --verbosity normal
   
+  run_powershell_tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj
+    - name: Build tests
+      run: dotnet build Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj --configuration Release --no-restore
+    - name: Run tests
+      run: dotnet test Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj --configuration Release --no-build --verbosity normal
+  
   build:
-    needs: run_tests
+    needs: [run_tests, run_powershell_tests]
     runs-on: ubuntu-latest
 
     steps:
