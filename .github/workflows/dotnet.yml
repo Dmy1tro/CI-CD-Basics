@@ -33,7 +33,7 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test Weather.Domain.Tests/Weather.Domain.Tests.csproj --no-build --verbosity normal
       
     - name: Publish
       run: dotnet publish Weather/Weather.csproj --configuration Release --output "./publish_artifacts"
