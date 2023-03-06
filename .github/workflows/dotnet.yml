@@ -18,72 +18,100 @@ jobs:
   run_tests:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 6.0.x
-    - name: Restore dependencies
-      run: dotnet restore Weather.Domain.Tests/Weather.Domain.Tests.csproj
-    - name: Build tests
-      run: dotnet build Weather.Domain.Tests/Weather.Domain.Tests.csproj --configuration Release --no-restore
-    - name: Run tests
-      run: dotnet test Weather.Domain.Tests/Weather.Domain.Tests.csproj --configuration Release --no-build --verbosity normal
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+      - name: Restore dependencies
+        run: dotnet restore Weather.Domain.Tests/Weather.Domain.Tests.csproj
+      - name: Build tests
+        run: dotnet build Weather.Domain.Tests/Weather.Domain.Tests.csproj --configuration Release --no-restore
+      - name: Run tests
+        run: dotnet test Weather.Domain.Tests/Weather.Domain.Tests.csproj --configuration Release --no-build --verbosity normal
   
   run_powershell_tests:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 6.0.x
-    - name: Restore dependencies
-      run: dotnet restore Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj
-    - name: Build tests
-      run: dotnet build Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj --configuration Release --no-restore
-    - name: Run tests
-      run: dotnet test Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj --configuration Release --no-build --verbosity normal
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+      - name: Restore dependencies
+        run: dotnet restore Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj
+      - name: Build tests
+        run: dotnet build Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj --configuration Release --no-restore
+      - name: Run tests
+        run: dotnet test Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj --configuration Release --no-build --verbosity normal
   
-  build:
+  build-web:
     needs: [run_tests, run_powershell_tests]
     runs-on: ubuntu-latest
-
+    # This 'if' just for testing purposes
+    if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 6.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
-    - name: Publish
-      run: dotnet publish Weather/Weather.csproj --configuration Release --output "Weather/publish_artifacts"
-    - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: weather-api-artifacts
-        path: "Weather/publish_artifacts/**"
-        if-no-files-found: error
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+      - name: Restore dependencies
+        run: dotnet restore Weather/Weather.csproj
+      - name: Build
+        run: dotnet build Weather/Weather.csproj --configuration Release --no-restore
+      - name: Publish
+        run: dotnet publish Weather/Weather.csproj --configuration Release --output "Weather/publish_artifacts"
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: weather-api-artifacts
+          path: "Weather/publish_artifacts/**"
+          if-no-files-found: error
 
-  deploy:
-      needs: build
-      runs-on: ubuntu-latest
-      environment:
-        name: 'production'
-        url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-      steps:
-        - name: Download a Build Artifact
-          uses: actions/download-artifact@v3
-          with:
-            name: weather-api-artifacts
-            path: weather-api-artifacts
-        - name: Deploy to Azure
-          id: deploy-to-azure
-          uses: azure/webapps-deploy@v2
-          with:
-            app-name: ${{ env.AZURE_WEBAPP_NAME }}
-            publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-            package: weather-api-artifacts
+  deploy-prod:
+    needs: build-web
+    runs-on: ubuntu-latest
+    environment:
+      name: 'production'
+      url: ${{ steps.deploy-to-azure.outputs.webapp-url }}
+    steps:
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: weather-api-artifacts
+          path: weather-api-artifacts
+      - name: Deploy to Azure
+        id: deploy-to-azure
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: weather-api-artifacts
+  
+  # upload-nuget-package:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   environment:
+  #     name: 'production'
+
+  deploy-dev:
+    needs: build-web
+    runs-on: ubuntu-latest
+    environment:
+      name: 'dev'
+      url: ${{ steps.deploy-to-azure.outputs.webapp-url }}
+    steps:
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: weather-api-artifacts
+          path: weather-api-artifacts
+      - name: Deploy to Azure
+        id: deploy-to-azure
+        uses: azure/webapps-deploy@v2
+        with:
+          # just use the same azure web-app as a 'dev'.
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: weather-api-artifacts
