@@ -99,10 +99,10 @@ jobs:
       #   run: dotnet build Weather.Shared/Weather.Shared.csproj --configuration Release --no-restore
       - name: Create the prerelease package
         if: ${{ github.event_name == 'pull_request' }}
-        run: dotnet pack --version-suffix "prerelease" --configuration Release --output "Weather.Shared/package_artifacts"
+        run: dotnet pack Weather.Shared/Weather.Shared.csproj --version-suffix "prerelease" --configuration Release --output "Weather.Shared/package_artifacts"
       - name: Create the release package
         if: ${{ github.event_name == 'push' }}
-        run: dotnet pack --configuration Release --output "Weather.Shared/package_artifacts"
+        run: dotnet pack Weather.Shared/Weather.Shared.csproj --configuration Release --output "Weather.Shared/package_artifacts"
       - name: Upload a Package Artifact
         uses: actions/upload-artifact@v3
         with:
@@ -134,7 +134,7 @@ jobs:
     needs: build-shared-package
     runs-on: ubuntu-latest
     environment:
-      name: 'production'
+      name: 'nuget'
     steps:
       - name: Download a Package Artifact
         uses: actions/download-artifact@v3
@@ -146,7 +146,7 @@ jobs:
         with:
           dotnet-version: 6.0.x
       - name: Upload to nuget
-        run: dotnet nuget push weather-shared-artifacts --api-key ${{ secrets.NUGET_API_KEY }}
+        run: dotnet nuget push "weather-shared-artifacts/**" --api-key ${{ secrets.NUGET_API_KEY }}
 
   deploy-dev:
     needs: build-web
