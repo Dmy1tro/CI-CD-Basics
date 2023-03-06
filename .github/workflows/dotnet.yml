@@ -93,16 +93,16 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 6.0.x
-      - name: Restore dependencies
-        run: dotnet restore Weather.Shared/Weather.Shared.csproj
-      - name: Build
-        run: dotnet build Weather.Shared/Weather.Shared.csproj --configuration Release --no-restore
+      # - name: Restore dependencies
+      #   run: dotnet restore Weather.Shared/Weather.Shared.csproj
+      # - name: Build
+      #   run: dotnet build Weather.Shared/Weather.Shared.csproj --configuration Release --no-restore
       - name: Create the prerelease package
         if: ${{ github.event_name == 'pull_request' }}
-        run: dotnet pack --version-suffix "prerelease" --configuration Release --output "Weather.Shared/package_artifacts" --no-build
+        run: dotnet pack --version-suffix "prerelease" --configuration Release --output "Weather.Shared/package_artifacts"
       - name: Create the release package
         if: ${{ github.event_name == 'push' }}
-        run: dotnet pack --configuration Release --output "Weather.Shared/package_artifacts" --no-build
+        run: dotnet pack --configuration Release --output "Weather.Shared/package_artifacts"
       - name: Upload a Package Artifact
         uses: actions/upload-artifact@v3
         with:
