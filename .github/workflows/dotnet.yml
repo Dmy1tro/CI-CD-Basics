@@ -10,6 +10,7 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
+  workflow_dispatch:
 
 env:
   AZURE_WEBAPP_NAME: "Weather-api-12345"
@@ -119,11 +120,7 @@ jobs:
 
 # Start Web jobs
   build-web:
-    needs: [run-tests, run-powershell-tests]
-    if: |
-      always()
-      && contains(needs.*.result, 'success')
-      && !contains(needs.*.result, 'failure')
+    needs: run-tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
