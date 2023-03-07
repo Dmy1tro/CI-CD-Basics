@@ -23,9 +23,11 @@ jobs:
     outputs:
       is-changed: ${{ steps.filter.outputs.shared }}
     steps:
+      - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
         id: filter
         with: 
+          base: master
           filters: |
             shared:
               - 'Weather.Shared/**'
@@ -36,9 +38,11 @@ jobs:
     outputs:
       is-changed: ${{ steps.filter.outputs.web }}
     steps:
+      - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
         id: filter
         with: 
+          base: master
           filters: |
             web:
               - 'Weather/**'
@@ -50,9 +54,11 @@ jobs:
     outputs:
       is-changed: ${{ steps.filter.outputs.powershell }}
     steps:
+      - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
         id: filter
         with: 
+          base: master
           filters: |
             web:
               - 'Weather.Cmdlets/**'
