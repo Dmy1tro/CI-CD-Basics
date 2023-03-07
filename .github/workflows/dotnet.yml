@@ -119,8 +119,6 @@ jobs:
 
 # Start Web jobs
   build-web:
-    needs: [is-web-changed, is-powershell-changed]
-    if: ${{ needs.is-web-changed.outputs.is-changed == 'true' || needs.is-powershell-changed.outputs.is-changed == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -186,8 +184,6 @@ jobs:
 
 # Start nuget package jobs
   build-shared-package:
-    needs: is-shared-changed
-    if: ${{ needs.is-shared-changed.outputs.is-changed == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
