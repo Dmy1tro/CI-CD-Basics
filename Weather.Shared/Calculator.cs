@@ -16,6 +16,6 @@ namespace Weather.Shared
             return Convert.ToDouble(result);
         }
 
-        public static double Add(double num1, double num2) => num1 + num2;
+        public static double Sub(double num1, double num2) => num1 - num2;
     }
 }
