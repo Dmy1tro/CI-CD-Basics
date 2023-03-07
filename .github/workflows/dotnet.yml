@@ -195,7 +195,9 @@ jobs:
           dotnet-version: 6.0.x
       - name: Create the prerelease package
         #if: ${{ github.event_name == 'pull_request' }}
-        run: dotnet pack Weather.Shared/Weather.Shared.csproj -p:PackageVersion=$([System.DateTime]::Now.ToString('yyyy.MM.dd.HHmm')) --version-suffix "prerelease" --configuration Release --output "Weather.Shared/package_artifacts"
+        run: |
+          dotnet pack Weather.Shared/Weather.Shared.csproj -p:PackageVersion=$([System.DateTime]::Now.ToString("yyyy.MM.dd.HHmm")) --version-suffix "prerelease" --configuration Release --output "Weather.Shared/package_artifacts"
+        shell: pwsh
       - name: Upload to nuget
         run: dotnet nuget push "Weather.Shared/package_artifacts/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 
@@ -210,7 +212,8 @@ jobs:
         with:
           dotnet-version: 6.0.x
       - name: Create the release package
-        run: dotnet pack Weather.Shared/Weather.Shared.csproj -p:PackageVersion=$([System.DateTime]::Now.ToString('yyyy.MM.dd.HHmm')) --configuration Release --output "Weather.Shared/package_artifacts"
+        run: |
+          dotnet pack Weather.Shared/Weather.Shared.csproj -p:PackageVersion=$([System.DateTime]::Now.ToString("yyyy.MM.dd.HHmm")) --configuration Release --output "Weather.Shared/package_artifacts"
       - name: Upload to nuget
         run: dotnet nuget push "Weather.Shared/package_artifacts/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 
