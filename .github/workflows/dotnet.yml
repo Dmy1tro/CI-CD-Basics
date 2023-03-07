@@ -15,10 +15,20 @@ env:
   AZURE_WEBAPP_NAME: "Weather-api-12345"
 
 jobs:
+# Start test jobs
   run_tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+      - id: changes
+        with: 
+         filters: |
+          weather_web:
+            - 'Weather/**'
+            - 'Weather.Domain/**'
+            - 'Weather.Domain.Tests/**'
+      - if: steps.changes.outputs.weather_web == 'true'
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
@@ -34,6 +44,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+      - id: changes
+        with: 
+         filters: |
+          powershell:
+            - 'Weather.Cmdlets/**'
+            - 'Weather.Cmdlets.Tests/**'
+      - if: steps.changes.outputs.powershell == 'true'
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
@@ -49,6 +67,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+      - id: changes
+        with: 
+         filters: |
+          shared:
+            - 'Weather.Shared/**'
+            - 'Weather.Shared.Tests/**'
+      - if: steps.changes.outputs.shared == 'true'
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
@@ -60,6 +86,9 @@ jobs:
       - name: Run tests
         run: dotnet test Weather.Shared.Tests/Weather.Shared.Tests.csproj --configuration Release --no-build --verbosity normal
 
+# End test jobs
+
+# Start Web jobs
   build-web:
     needs: [run_tests, run_powershell_tests]
     runs-on: ubuntu-latest
@@ -84,31 +113,26 @@ jobs:
           path: "Weather/publish_artifacts/**"
           if-no-files-found: error
 
-  build-shared-package:
-    needs: run_shared_tests
+  deploy-dev:
+    needs: build-web
     runs-on: ubuntu-latest
+    environment:
+      name: 'dev'
+      url: ${{ steps.deploy-to-azure.outputs.webapp-url }}
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v3
         with:
-          dotnet-version: 6.0.x
-      # - name: Restore dependencies
-      #   run: dotnet restore Weather.Shared/Weather.Shared.csproj
-      # - name: Build
-      #   run: dotnet build Weather.Shared/Weather.Shared.csproj --configuration Release --no-restore
-      - name: Create the prerelease package
-        if: ${{ github.event_name == 'pull_request' }}
-        run: dotnet pack Weather.Shared/Weather.Shared.csproj --version-suffix "prerelease" --configuration Release --output "Weather.Shared/package_artifacts"
-      - name: Create the release package
-        if: ${{ github.event_name == 'push' }}
-        run: dotnet pack Weather.Shared/Weather.Shared.csproj --configuration Release --output "Weather.Shared/package_artifacts"
-      - name: Upload a Package Artifact
-        uses: actions/upload-artifact@v3
+          name: weather-api-artifacts
+          path: weather-api-artifacts
+      - name: Deploy to Azure
+        id: deploy-to-azure
+        uses: azure/webapps-deploy@v2
         with:
-          name: weather-shared-artifacts
-          path: "Weather.Shared/package_artifacts/**"
-          if-no-files-found: error
+          # just use the same azure web-app as a 'dev'.
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: weather-api-artifacts
 
   deploy-prod:
     needs: build-web
@@ -130,6 +154,31 @@ jobs:
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: weather-api-artifacts
 
+# End web jobs
+
+# Start nuget package jobs
+  build-shared-package:
+    needs: run_shared_tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+      - name: Create the prerelease package
+        if: ${{ github.event_name == 'pull_request' }}
+        run: dotnet pack Weather.Shared/Weather.Shared.csproj --version-suffix "prerelease" --configuration Release --output "Weather.Shared/package_artifacts"
+      - name: Create the release package
+        if: ${{ github.event_name == 'push' }}
+        run: dotnet pack Weather.Shared/Weather.Shared.csproj --configuration Release --output "Weather.Shared/package_artifacts"
+      - name: Upload a Package Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: weather-shared-artifacts
+          path: "Weather.Shared/package_artifacts/**"
+          if-no-files-found: error
+
   release-shared-nuget-package:
     needs: build-shared-package
     runs-on: ubuntu-latest
@@ -148,23 +197,4 @@ jobs:
       - name: Upload to nuget
         run: dotnet nuget push "weather-shared-artifacts/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 
-  deploy-dev:
-    needs: build-web
-    runs-on: ubuntu-latest
-    environment:
-      name: 'dev'
-      url: ${{ steps.deploy-to-azure.outputs.webapp-url }}
-    steps:
-      - name: Download a Build Artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: weather-api-artifacts
-          path: weather-api-artifacts
-      - name: Deploy to Azure
-        id: deploy-to-azure
-        uses: azure/webapps-deploy@v2
-        with:
-          # just use the same azure web-app as a 'dev'.
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: weather-api-artifacts
+# End nuget package jobs
