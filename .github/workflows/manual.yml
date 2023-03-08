@@ -1,74 +1,18 @@
-
-# https://docs.github.com/en/actions/deployment/deploying-to-your-cloud-provider/deploying-to-azure/deploying-net-to-azure-app-service
-# https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-# https://learn.microsoft.com/en-us/dotnet/architecture/devops-for-aspnet-developers/actions-build
-
-name: Automated Test & Build & Deploy
+name: Manual Test & Build & Deploy
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
   workflow_dispatch:
-
+    branches: ["master"]
+  
 env:
   AZURE_WEBAPP_NAME: "Weather-api-12345"
 
 jobs:
-# Start test jobs
-
-  # https://github.com/dorny/paths-filter#examples
-  is-shared-changed:
-    runs-on: ubuntu-latest
-    outputs:
-      is-changed: ${{ steps.filter.outputs.shared }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: dorny/paths-filter@v2
-        id: filter
-        with: 
-          base: master
-          filters: |
-            shared:
-              - 'Weather.Shared/**'
-              - 'Weather.Shared.Tests/**'
-
-  is-web-changed:
-    runs-on: ubuntu-latest
-    outputs:
-      is-changed: ${{ steps.filter.outputs.web }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: dorny/paths-filter@v2
-        id: filter
-        with: 
-          base: master
-          filters: |
-            web:
-              - 'Weather/**'
-              - 'Weather.Domain/**'
-              - 'Weather.Domain.Tests/**'
-
-  is-powershell-changed:
-    runs-on: ubuntu-latest
-    outputs:
-      is-changed: ${{ steps.filter.outputs.powershell }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: dorny/paths-filter@v2
-        id: filter
-        with: 
-          base: master
-          filters: |
-            web:
-              - 'Weather.Cmdlets/**'
-              - 'Weather.Cmdlets.Tests/**'
-
+# Tests
   run-tests:
-    needs: is-web-changed
-    if: ${{ needs.is-web-changed.outputs.is-changed == 'true' }}
     runs-on: ubuntu-latest
+    environment:
+      name: 'manual-run-all-tests'
     steps:
       - uses: actions/checkout@v3
       - name: Setup .NET
@@ -80,12 +24,18 @@ jobs:
       - name: Build tests
         run: dotnet build Weather.Domain.Tests/Weather.Domain.Tests.csproj --configuration Release --no-restore
       - name: Run tests
-        run: dotnet test Weather.Domain.Tests/Weather.Domain.Tests.csproj --configuration Release --no-build --verbosity normal
+        run: dotnet test Weather.Domain.Tests/Weather.Domain.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-web.trx"
+      - name: Publish tests results
+        uses: actions/upload-artifact@v2
+          with:
+            name: test-results-web
+            path: '**/test-results-web.xml'
+            if-no-files-found: error
   
   run-powershell-tests:
-    needs: is-powershell-changed
-    if: ${{ needs.is-powershell-changed.outputs.is-changed == 'true' }}
     runs-on: ubuntu-latest
+    environment:
+      name: 'manual-run-all-tests'
     steps:
       - uses: actions/checkout@v3
       - name: Setup .NET
@@ -97,12 +47,18 @@ jobs:
       - name: Build tests
         run: dotnet build Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj --configuration Release --no-restore
       - name: Run tests
-        run: dotnet test Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj --configuration Release --no-build --verbosity normal
+        run: dotnet test Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-powershell.trx"
+      - name: Publish tests results
+        uses: actions/upload-artifact@v2
+          with:
+            name: test-results-powershell
+            path: '**/test-results-powershell.xml'
+            if-no-files-found: error
   
   run-shared-tests:
-    needs: is-shared-changed
-    if: ${{ needs.is-shared-changed.outputs.is-changed == 'true' }}
     runs-on: ubuntu-latest
+    environment:
+      name: 'manual-run-all-tests'
     steps:
       - uses: actions/checkout@v3
       - name: Setup .NET
@@ -114,14 +70,19 @@ jobs:
       - name: Build tests
         run: dotnet build Weather.Shared.Tests/Weather.Shared.Tests.csproj --configuration Release --no-restore
       - name: Run tests
-        run: dotnet test Weather.Shared.Tests/Weather.Shared.Tests.csproj --configuration Release --no-build --verbosity normal
+        run: dotnet test Weather.Shared.Tests/Weather.Shared.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-shared.trx"
+      - name: Publish tests results
+        uses: actions/upload-artifact@v2
+          with:
+            name: test-results-shared
+            path: '**/test-results-shared.xml'
+            if-no-files-found: error
 
-# End test jobs
-
-# Start Web jobs
-  build-web:
-    needs: [run-tests, run-powershell-tests]
+# Web
+build-web:
     runs-on: ubuntu-latest
+    environment:
+      name: 'manual-build-web'
     steps:
       - uses: actions/checkout@v3
       - name: Setup .NET
@@ -182,11 +143,8 @@ jobs:
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: weather-api-artifacts
 
-# End web jobs
-
-# Start nuget package jobs
+# Nuget package
   prerelease-shared-nuget-package:
-    needs: run-shared-tests
     runs-on: ubuntu-latest
     environment:
       name: 'nuget-prerelease'
@@ -205,7 +163,6 @@ jobs:
         run: dotnet nuget push "Weather.Shared/package_artifacts/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 
   release-shared-nuget-package:
-    needs: run-shared-tests
     runs-on: ubuntu-latest
     environment:
       name: 'nuget-release'
@@ -222,5 +179,3 @@ jobs:
           dotnet pack Weather.Shared/Weather.Shared.csproj -p:PackageVersion=$version --configuration Release --output "Weather.Shared/package_artifacts"
       - name: Upload to nuget
         run: dotnet nuget push "Weather.Shared/package_artifacts/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
-
-# End nuget package jobs
