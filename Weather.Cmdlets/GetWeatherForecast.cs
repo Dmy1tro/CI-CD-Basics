@@ -18,7 +18,7 @@ namespace Weather.Cmdlets
         }
 
         [Parameter(Mandatory = false)]
-        public int Days { get; set; } = 5;
+        public int Days { get; set; } = 7;
 
         protected override void ProcessRecord()
         {
