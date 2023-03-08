@@ -121,6 +121,7 @@ jobs:
 # Start Web jobs
   build-web:
     needs: [run-tests, run-powershell-tests]
+    if: ${{ contains(join(needs.*.result, ','), 'success') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
