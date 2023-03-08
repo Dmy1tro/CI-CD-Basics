@@ -24,7 +24,7 @@ jobs:
       - name: Build tests
         run: dotnet build Weather.Domain.Tests/Weather.Domain.Tests.csproj --configuration Release --no-restore
       - name: Run tests
-        run: dotnet test Weather.Domain.Tests/Weather.Domain.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-web.trx"
+        run: dotnet test Weather.Domain.Tests/Weather.Domain.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-web.xml"
       - name: Publish tests results
         uses: actions/upload-artifact@v2
         with:
@@ -47,7 +47,7 @@ jobs:
       - name: Build tests
         run: dotnet build Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj --configuration Release --no-restore
       - name: Run tests
-        run: dotnet test Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-powershell.trx"
+        run: dotnet test Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-powershell.xml"
       - name: Publish tests results
         uses: actions/upload-artifact@v2
         with:
@@ -70,7 +70,7 @@ jobs:
       - name: Build tests
         run: dotnet build Weather.Shared.Tests/Weather.Shared.Tests.csproj --configuration Release --no-restore
       - name: Run tests
-        run: dotnet test Weather.Shared.Tests/Weather.Shared.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-shared.trx"
+        run: dotnet test Weather.Shared.Tests/Weather.Shared.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-shared.xml"
       - name: Publish tests results
         uses: actions/upload-artifact@v2
         with:
