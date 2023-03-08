@@ -12,5 +12,16 @@ namespace Weather.Shared.Tests
 
             Assert.Equal(expected, result);
         }
+
+        [Theory]
+        [InlineData(11d, 7d, 4d)]
+        [InlineData(0d, 13d, -13d)]
+        [InlineData(123d, 23d, 100d)]
+        public void Should_Sub_Successfully(double n1, double n2, double expected)
+        {
+            var result = Calculator.Sub(n1, n2);
+
+            Assert.Equal(expected, result);
+        }
     }
 }
