@@ -2,7 +2,7 @@ name: Manual Test & Build & Deploy
 
 on:
   workflow_dispatch:
-    branches: ["master"]
+  # Any branch
   
 env:
   AZURE_WEBAPP_NAME: "Weather-api-12345"
@@ -26,7 +26,7 @@ jobs:
       - name: Run tests
         run: dotnet test Weather.Domain.Tests/Weather.Domain.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-web.xml"
       - name: Publish tests results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: test-results-web
           path: '**/test-results-web.xml'
@@ -49,7 +49,7 @@ jobs:
       - name: Run tests
         run: dotnet test Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-powershell.xml"
       - name: Publish tests results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: test-results-powershell
           path: '**/test-results-powershell.xml'
@@ -72,7 +72,7 @@ jobs:
       - name: Run tests
         run: dotnet test Weather.Shared.Tests/Weather.Shared.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-shared.xml"
       - name: Publish tests results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: test-results-shared
           path: '**/test-results-shared.xml'
@@ -157,8 +157,8 @@ jobs:
       - name: Create the prerelease package
         shell: pwsh
         run: |
-          $version = [System.DateTime]::Now.ToString("yyyy.MM.dd.HHmm")
-          dotnet pack Weather.Shared/Weather.Shared.csproj -p:PackageVersion=$version --version-suffix "prerelease" --configuration Release --output "Weather.Shared/package_artifacts"
+          $version = [System.DateTime]::Now.ToString("yyyy.MM.dd.HHmm") + "-prerelease"
+          dotnet pack Weather.Shared/Weather.Shared.csproj -p:PackageVersion=$version --configuration Release --output "Weather.Shared/package_artifacts"
       - name: Upload to nuget
         run: dotnet nuget push "Weather.Shared/package_artifacts/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 

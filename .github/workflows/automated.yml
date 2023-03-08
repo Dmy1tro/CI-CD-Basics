@@ -199,8 +199,8 @@ jobs:
       - name: Create the prerelease package
         shell: pwsh
         run: |
-          $version = [System.DateTime]::Now.ToString("yyyy.MM.dd.HHmm")
-          dotnet pack Weather.Shared/Weather.Shared.csproj -p:PackageVersion=$version --version-suffix "prerelease" --configuration Release --output "Weather.Shared/package_artifacts"
+          $version = [System.DateTime]::Now.ToString("yyyy.MM.dd.HHmm") + "-prerelease"
+          dotnet pack Weather.Shared/Weather.Shared.csproj -p:PackageVersion=$version --configuration Release --output "Weather.Shared/package_artifacts"
       - name: Upload to nuget
         run: dotnet nuget push "Weather.Shared/package_artifacts/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 
