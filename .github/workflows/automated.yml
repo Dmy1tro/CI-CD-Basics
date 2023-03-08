@@ -121,7 +121,7 @@ jobs:
 # Start Web jobs
   build-web:
     needs: [run-tests, run-powershell-tests]
-    if: ${{ always() && needs.run-tests.result != 'failure' && needs.run-powershell-tests.result != 'failure' && needs.run-tests.result != 'skipped' && needs.run-powershell-tests.result != 'skipped' }}
+    if: ${{ always() && needs.run-tests.result != 'failure' && needs.run-powershell-tests.result != 'failure' && (needs.run-tests.result != 'skipped' || needs.run-powershell-tests.result != 'skipped') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
