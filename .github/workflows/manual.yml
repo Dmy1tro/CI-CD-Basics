@@ -27,10 +27,10 @@ jobs:
         run: dotnet test Weather.Domain.Tests/Weather.Domain.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-web.trx"
       - name: Publish tests results
         uses: actions/upload-artifact@v2
-          with:
-            name: test-results-web
-            path: '**/test-results-web.xml'
-            if-no-files-found: error
+        with:
+          name: test-results-web
+          path: '**/test-results-web.xml'
+          if-no-files-found: error
   
   run-powershell-tests:
     runs-on: ubuntu-latest
