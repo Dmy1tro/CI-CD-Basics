@@ -144,7 +144,7 @@ jobs:
 
   deploy-dev:
     needs: build-web
-    if: ${{ always() }}
+    if: ${{ always() && needs.build-web.result == 'success' }}
     runs-on: ubuntu-latest
     environment:
       name: 'dev'
@@ -166,7 +166,7 @@ jobs:
 
   deploy-prod:
     needs: build-web
-    if: ${{ always() }}
+    if: ${{ always() && needs.build-web.result == 'success' }}
     runs-on: ubuntu-latest
     environment:
       name: 'production'
