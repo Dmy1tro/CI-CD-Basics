@@ -24,14 +24,6 @@ namespace Weather.Domain.Tests
             Assert.Throws<ArgumentException>(() => _weatherService.GetWeatherForecasts(days));
         }
 
-        [Fact(Skip = "Turn on later")]
-        public void Long_Runnig_Test()
-        {
-            Task.Delay(30_000).GetAwaiter().GetResult(); // 30 sec
-
-            Assert.True(true);
-        }
-
         [Fact]
         public void Should_Throw_Argument_Exception_When_City_Is_Empty()
         {
