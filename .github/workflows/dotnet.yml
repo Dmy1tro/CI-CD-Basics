@@ -3,7 +3,7 @@
 # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 # https://learn.microsoft.com/en-us/dotnet/architecture/devops-for-aspnet-developers/actions-build
 
-name: Test & Build & Deploy Weather API
+name: Test & Build & Deploy
 
 on:
   push:
@@ -120,7 +120,7 @@ jobs:
 
 # Start Web jobs
   build-web:
-    needs: run-tests
+    needs: [run-tests, run-powershell-tests]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
