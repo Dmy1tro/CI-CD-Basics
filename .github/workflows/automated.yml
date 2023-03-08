@@ -61,7 +61,7 @@ jobs:
         with: 
           base: master
           filters: |
-            web:
+            powershell:
               - 'Weather.Cmdlets/**'
               - 'Weather.Cmdlets.Tests/**'
 
@@ -121,7 +121,7 @@ jobs:
 # Start Web jobs
   build-web:
     needs: [run-tests, run-powershell-tests]
-    if: ${{ always() && contains(join(needs.*.result, ','), 'success') }}
+    if: ${{ always() && needs.run-tests.result != 'failure' && needs.run-powershell-tests.result != 'failure' && needs.run-tests.result != 'skipped' && needs.run-powershell-tests.result != 'skipped' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -144,7 +144,7 @@ jobs:
 
   deploy-dev:
     needs: build-web
-    if: ${{ always() }}
+    if: ${{ always() && needs.build-web.result == 'success' }}
     runs-on: ubuntu-latest
     environment:
       name: 'dev'
@@ -166,7 +166,7 @@ jobs:
 
   deploy-prod:
     needs: build-web
-    if: ${{ always() }}
+    if: ${{ always() && needs.build-web.result == 'success' }}
     runs-on: ubuntu-latest
     environment:
       name: 'production'
