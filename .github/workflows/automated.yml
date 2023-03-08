@@ -121,6 +121,7 @@ jobs:
 # Start Web jobs
   build-web:
     needs: [run-tests, run-powershell-tests]
+    if: ${{ always() && contains(join(needs.*.result, ','), 'success') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -143,6 +144,7 @@ jobs:
 
   deploy-dev:
     needs: build-web
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     environment:
       name: 'dev'
@@ -164,6 +166,7 @@ jobs:
 
   deploy-prod:
     needs: build-web
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     environment:
       name: 'production'
