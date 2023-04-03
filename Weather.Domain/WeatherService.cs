@@ -4,7 +4,7 @@
     {
         private static readonly string[] _summaries = new[]
         {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching", "Very nice"
         };
 
         public IReadOnlyCollection<WeatherForecast> GetWeatherForecasts(int days)
