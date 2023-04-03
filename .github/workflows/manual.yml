@@ -24,11 +24,12 @@ jobs:
         run: dotnet build Weather.Domain.Tests/Weather.Domain.Tests.csproj --configuration Release --no-restore
       - name: Run tests
         run: dotnet test Weather.Domain.Tests/Weather.Domain.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-web.xml"
-      - name: Publish test results
-        uses: EnricoMi/publish-unit-test-result-action@v2
+      - name: Test Report
+        uses: dorny/test-reporter@v1
         with:
-          files: |
-            '**/test-results-web.xml'
+          name: Domain Tests
+          path: '**/test-results-web.xml'
+          reporter: dotnet-trx
       - name: Upload tests results
         uses: actions/upload-artifact@v3
         with:
@@ -52,11 +53,12 @@ jobs:
         run: dotnet build Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj --configuration Release --no-restore
       - name: Run tests
         run: dotnet test Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-powershell.xml"
-      - name: Publish test results
-        uses: EnricoMi/publish-unit-test-result-action@v2
+      - name: Test Report
+        uses: dorny/test-reporter@v1
         with:
-          files: |
-            '**/test-results-powershell.xml'
+          name: Powershell Tests
+          path: '**/test-results-powershell.xml'
+          reporter: dotnet-trx
       - name: Upload tests results
         uses: actions/upload-artifact@v3
         with:
@@ -80,11 +82,12 @@ jobs:
         run: dotnet build Weather.Shared.Tests/Weather.Shared.Tests.csproj --configuration Release --no-restore
       - name: Run tests
         run: dotnet test Weather.Shared.Tests/Weather.Shared.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-shared.xml"
-      - name: Publish test results
-        uses: EnricoMi/publish-unit-test-result-action@v2
+      - name: Test Report
+        uses: dorny/test-reporter@v1
         with:
-          files: |
-            '**/test-results-shared.xml'
+          name: Shared Tests
+          path: '**/test-results-shared.xml'
+          reporter: dotnet-trx
       - name: Upload tests results
         uses: actions/upload-artifact@v3
         with:
