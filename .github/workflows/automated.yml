@@ -120,8 +120,8 @@ jobs:
 
 # Start Web jobs
   build-web:
-    needs: [run-tests, run-powershell-tests]
-    if: ${{ always() && needs.run-tests.result != 'failure' && needs.run-powershell-tests.result != 'failure' && (needs.run-tests.result != 'skipped' || needs.run-powershell-tests.result != 'skipped') }}
+    needs: [is-web-changed]
+    if: ${{ needs.is-web-changed.outputs.is-changed == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -143,8 +143,8 @@ jobs:
           if-no-files-found: error
 
   deploy-dev:
-    needs: build-web
-    if: ${{ always() && needs.build-web.result == 'success' }}
+    needs: [build-web, run-tests]
+    # if: ${{ always() && needs.build-web.result == 'success' }}
     runs-on: ubuntu-latest
     environment:
       name: 'dev'
@@ -165,7 +165,7 @@ jobs:
           package: weather-api-artifacts
 
   deploy-prod:
-    needs: build-web
+    needs: [build-web, run-tests]
     if: ${{ always() && needs.build-web.result == 'success' }}
     runs-on: ubuntu-latest
     environment:

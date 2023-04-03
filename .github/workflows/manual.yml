@@ -9,7 +9,7 @@ env:
 
 jobs:
 # Tests
-  run-tests:
+  run-domain-tests:
     runs-on: ubuntu-latest
     environment:
       name: 'manual-run-all-tests'
@@ -25,7 +25,12 @@ jobs:
         run: dotnet build Weather.Domain.Tests/Weather.Domain.Tests.csproj --configuration Release --no-restore
       - name: Run tests
         run: dotnet test Weather.Domain.Tests/Weather.Domain.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-web.xml"
-      - name: Publish tests results
+      - name: Publish test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: |
+            '**/test-results-web.xml'
+      - name: Upload tests results
         uses: actions/upload-artifact@v3
         with:
           name: test-results-web
@@ -48,7 +53,12 @@ jobs:
         run: dotnet build Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj --configuration Release --no-restore
       - name: Run tests
         run: dotnet test Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-powershell.xml"
-      - name: Publish tests results
+      - name: Publish test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: |
+            '**/test-results-powershell.xml'
+      - name: Upload tests results
         uses: actions/upload-artifact@v3
         with:
           name: test-results-powershell
@@ -71,7 +81,12 @@ jobs:
         run: dotnet build Weather.Shared.Tests/Weather.Shared.Tests.csproj --configuration Release --no-restore
       - name: Run tests
         run: dotnet test Weather.Shared.Tests/Weather.Shared.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-shared.xml"
-      - name: Publish tests results
+      - name: Publish test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: |
+            '**/test-results-shared.xml'
+      - name: Upload tests results
         uses: actions/upload-artifact@v3
         with:
           name: test-results-shared
@@ -80,6 +95,7 @@ jobs:
 
 # Web
   build-web:
+    needs: [run-domain-tests, run-powershell-tests, run-shared-tests]
     runs-on: ubuntu-latest
     environment:
       name: 'manual-build-web'
@@ -145,6 +161,7 @@ jobs:
 
 # Nuget package
   prerelease-shared-nuget-package:
+    needs: [run-shared-tests]
     runs-on: ubuntu-latest
     environment:
       name: 'nuget-prerelease'
@@ -163,6 +180,7 @@ jobs:
         run: dotnet nuget push "Weather.Shared/package_artifacts/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 
   release-shared-nuget-package:
+  needs: [run-shared-tests]
     runs-on: ubuntu-latest
     environment:
       name: 'nuget-release'
