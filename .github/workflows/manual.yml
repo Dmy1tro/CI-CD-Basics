@@ -28,7 +28,7 @@ jobs:
         uses: dorny/test-reporter@v1
         with:
           name: Domain Tests
-          path: '**/test-results-web.xml'
+          path: 'Weather.Domain.Tests/TestResults/test-results-web.xml'
           reporter: dotnet-trx
       - name: Upload tests results
         uses: actions/upload-artifact@v3
@@ -57,7 +57,7 @@ jobs:
         uses: dorny/test-reporter@v1
         with:
           name: Powershell Tests
-          path: '**/test-results-powershell.xml'
+          path: 'Weather.Cmdlets.Tests/TestResults/test-results-powershell.xml'
           reporter: dotnet-trx
       - name: Upload tests results
         uses: actions/upload-artifact@v3
@@ -86,7 +86,7 @@ jobs:
         uses: dorny/test-reporter@v1
         with:
           name: Shared Tests
-          path: '**/test-results-shared.xml'
+          path: 'Weather.Shared.Tests/TestResults/test-results-shared.xml'
           reporter: dotnet-trx
       - name: Upload tests results
         uses: actions/upload-artifact@v3
