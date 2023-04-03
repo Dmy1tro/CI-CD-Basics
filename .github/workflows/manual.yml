@@ -182,7 +182,7 @@ jobs:
         run: dotnet nuget push "Weather.Shared/package_artifacts/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 
   release-shared-nuget-package:
-  needs: [run-shared-tests]
+    needs: [run-shared-tests]
     runs-on: ubuntu-latest
     environment:
       name: 'nuget-release'
