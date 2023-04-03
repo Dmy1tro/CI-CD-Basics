@@ -8,7 +8,7 @@ env:
   AZURE_WEBAPP_NAME: "Weather-api-12345"
 
 jobs:
-# Tests
+  # Tests
   run-domain-tests:
     runs-on: ubuntu-latest
     environment:
