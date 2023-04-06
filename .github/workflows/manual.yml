@@ -24,14 +24,14 @@ jobs:
         run: dotnet build Weather.Domain.Tests/Weather.Domain.Tests.csproj --configuration Release --no-restore
       - name: Run tests
         run: dotnet test Weather.Domain.Tests/Weather.Domain.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-web.xml"
-      - name: Test Report
-        uses: phoenix-actions/test-reporting@v8
-        id: domain-test-reporter
-        if: success() || failure()
-        with:
-          name: test-report-domain
-          path: Weather.Domain.Tests/TestResults/test-results-web.xml
-          reporter: dotnet-trx
+      # - name: Test Report
+      #   uses: phoenix-actions/test-reporting@v8
+      #   id: domain-test-reporter
+      #   if: success() || failure()
+      #   with:
+      #     name: test-report-domain
+      #     path: Weather.Domain.Tests/TestResults/test-results-web.xml
+      #     reporter: dotnet-trx
       - name: Upload tests results
         uses: actions/upload-artifact@v3
         with:
@@ -55,14 +55,14 @@ jobs:
         run: dotnet build Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj --configuration Release --no-restore
       - name: Run tests
         run: dotnet test Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-powershell.xml"
-      - name: Test Report
-        uses: phoenix-actions/test-reporting@v8
-        id: powershell-test-reporter
-        if: success() || failure()
-        with:
-          name: test-report-powershell
-          path: Weather.Cmdlets.Tests/TestResults/test-results-powershell.xml
-          reporter: dotnet-trx
+      # - name: Test Report
+      #   uses: phoenix-actions/test-reporting@v8
+      #   id: powershell-test-reporter
+      #   if: success() || failure()
+      #   with:
+      #     name: test-report-powershell
+      #     path: Weather.Cmdlets.Tests/TestResults/test-results-powershell.xml
+      #     reporter: dotnet-trx
       - name: Upload tests results
         uses: actions/upload-artifact@v3
         with:
@@ -86,14 +86,14 @@ jobs:
         run: dotnet build Weather.Shared.Tests/Weather.Shared.Tests.csproj --configuration Release --no-restore
       - name: Run tests
         run: dotnet test Weather.Shared.Tests/Weather.Shared.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-shared.xml"
-      - name: Test Report
-        uses: phoenix-actions/test-reporting@v8
-        id: shared-test-reporter
-        if: success() || failure()
-        with:
-          name: test-report-shared
-          path: Weather.Shared.Tests/TestResults/test-results-shared.xml
-          reporter: dotnet-trx
+      # - name: Test Report
+      #   uses: phoenix-actions/test-reporting@v8
+      #   id: shared-test-reporter
+      #   if: success() || failure()
+      #   with:
+      #     name: test-report-shared
+      #     path: Weather.Shared.Tests/TestResults/test-results-shared.xml
+      #     reporter: dotnet-trx
       - name: Upload tests results
         uses: actions/upload-artifact@v3
         with:
