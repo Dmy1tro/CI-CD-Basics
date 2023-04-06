@@ -25,11 +25,10 @@ jobs:
       - name: Run tests
         run: dotnet test Weather.Domain.Tests/Weather.Domain.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-web.xml"
       - name: Test Report
-        uses: dorny/test-reporter@v1
+        uses: EnricoMi/publish-unit-test-result-action@v2
         with:
-          name: Domain Tests
-          path: 'Weather.Domain.Tests/TestResults/test-results-web.xml'
-          reporter: dotnet-trx
+          files: |
+            Weather.Domain.Tests/TestResults/test-results-web.xml
       - name: Upload tests results
         uses: actions/upload-artifact@v3
         with:
@@ -54,11 +53,10 @@ jobs:
       - name: Run tests
         run: dotnet test Weather.Cmdlets.Tests/Weather.Cmdlets.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-powershell.xml"
       - name: Test Report
-        uses: dorny/test-reporter@v1
+        uses: EnricoMi/publish-unit-test-result-action@v2
         with:
-          name: Powershell Tests
-          path: 'Weather.Cmdlets.Tests/TestResults/test-results-powershell.xml'
-          reporter: dotnet-trx
+          files: |
+            Weather.Cmdlets.Tests/TestResults/test-results-powershell.xml
       - name: Upload tests results
         uses: actions/upload-artifact@v3
         with:
@@ -83,11 +81,10 @@ jobs:
       - name: Run tests
         run: dotnet test Weather.Shared.Tests/Weather.Shared.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results-shared.xml"
       - name: Test Report
-        uses: dorny/test-reporter@v1
+        uses: EnricoMi/publish-unit-test-result-action@v2
         with:
-          name: Shared Tests
-          path: 'Weather.Shared.Tests/TestResults/test-results-shared.xml'
-          reporter: dotnet-trx
+          files: |
+            Weather.Shared.Tests/TestResults/test-results-shared.xml
       - name: Upload tests results
         uses: actions/upload-artifact@v3
         with:
