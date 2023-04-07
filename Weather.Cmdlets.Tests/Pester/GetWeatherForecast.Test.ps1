@@ -8,7 +8,7 @@ Describe "Get-WeatherForecast" {
             Import-Module Pester -RequiredVersion 5.2.2 -Force
         }
 
-        If (-not (Get-Module Weather.Cmdlets))
+        If (-not (Get-Module WeatherCmdlets))
         {
             $pathToCmdletsProject = "$PSScriptRoot/../../Weather.Cmdlets"
             dotnet build "$pathToCmdletsProject/Weather.Cmdlets.csproj" -c Release

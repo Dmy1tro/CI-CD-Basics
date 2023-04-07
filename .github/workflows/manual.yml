@@ -120,10 +120,10 @@ jobs:
           }
           
           # Execute all tests
-          $testScriptsPath = "Weather.Cmdlets.Tests/Pester"
+          $testScriptsPath = "${{GITHUB_WORKSPACE}}/Weather.Cmdlets.Tests/Pester"
       
           # Create the test results file
-          $testResultsFile = "Weather.Cmdlets.Tests/TEST-Results.Pester.xml"
+          $testResultsFile = "${{GITHUB_WORKSPACE}}/Weather.Cmdlets.Tests/TEST-Results.Pester.xml"
       
           if (Test-Path $testResultsFile) {
               Remove-Item -Path $testResultsFile
