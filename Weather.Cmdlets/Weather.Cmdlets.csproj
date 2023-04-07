@@ -14,4 +14,10 @@
     <ProjectReference Include="..\Weather.Domain\Weather.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="WeatherCmdlets.psd1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

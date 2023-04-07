@@ -101,6 +101,56 @@ jobs:
           path: '**/test-results-shared.xml'
           if-no-files-found: error
 
+  run-pester-tests:
+    runs-on: ubuntu-latest
+    environment:
+      name: 'manual-run-all-tests'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Invoke-Pester
+        shell: pwsh
+        run: |
+          # install and import Pester
+          if (-not (Get-Module -ListAvailable -Name Pester | Where-Object {$_.Version -eq "5.2.2"})) {
+              Install-Module -Name Pester -RequiredVersion 5.2.2 -Scope CurrentUser -Force
+          }
+      
+          if (-not (Get-Module -Name Pester)) {
+              Import-Module Pester -RequiredVersion 5.2.2 -Force -Global -PassThru
+          }
+          
+          # Execute all tests
+          $testScriptsPath = "Weather.Cmdlets.Tests/Pester"
+      
+          # Create the test results file
+          $testResultsFile = "Weather.Cmdlets.Tests/TEST-Results.Pester.xml"
+      
+          if (Test-Path $testResultsFile) {
+              Remove-Item -Path $testResultsFile
+          }
+      
+          $pesterConfiguration = [PesterConfiguration]@{
+              Run = @{
+                  Path = $testScriptsPath;
+              };
+              TestResult = @{
+                  Enabled = $true;
+                  OutputPath = $testResultsFile;
+                  OutputFormat = 'NUnitXML';
+              };
+              Filter = @{
+                  ExcludeTag = 'Excluded';
+              }
+          }
+
+          Invoke-Pester -Configuration $pesterConfiguration
+      - name: Upload tests results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-pester
+          path: '**/TEST-Results.Pester.xml'
+          if-no-files-found: error
+
 # Web
   build-web:
     needs: [run-domain-tests, run-powershell-tests, run-shared-tests]
@@ -205,3 +255,26 @@ jobs:
           dotnet pack Weather.Shared/Weather.Shared.csproj -p:PackageVersion=$version --configuration Release --output "Weather.Shared/package_artifacts"
       - name: Upload to nuget
         run: dotnet nuget push "Weather.Shared/package_artifacts/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+
+  release-myget-package:
+    needs: [run-pester-tests]
+    runs-on: ubuntu-latest
+    environment:
+      name: 'myget-release'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build cmdlets
+        run: dotnet build Weather.Cmdlets/Weather.Cmdlets.csproj --configuration Release --no-restore
+      - name: Upload to myget
+        shell: pwsh
+        run: |
+          Import-Module PowerShellGet
+          $FeedName = "ci-cd-basics-packages"
+          $PSGalleryPublishUri = 'https://www.myget.org/F/$FeedName/api/v2/package'
+          $PSGallerySourceUri = 'https://www.myget.org/F/$FeedName/api/v2'
+          $APIKey = "5d8d8afa-e399-4cb4-965e-edab5944268e"
+
+          # Publish the module the the SkyKick MyGet PowerShell feed
+          $ModulePath = "Weather.Cmdlets/Release/net6.0"
+          Register-PSRepository -Name $FeedName -SourceLocation $PSGallerySourceUri -PublishLocation $PSGalleryPublishUri
+          Publish-Module -Path $(ModulePath) -NuGetApiKey $APIKey -Repository $FeedName -Verbose
