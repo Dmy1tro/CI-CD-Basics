@@ -111,19 +111,19 @@ jobs:
         shell: pwsh
         run: |
           # install and import Pester
-          if (-not (Get-Module -ListAvailable -Name Pester | Where-Object {$_.Version -eq "5.2.2"})) {
-              Install-Module -Name Pester -RequiredVersion 5.2.2 -Scope CurrentUser -Force
+          if (-not (Get-Module -ListAvailable -Name Pester)) {
+              Install-Module -Name Pester
           }
-      
+
           if (-not (Get-Module -Name Pester)) {
-              Import-Module Pester -RequiredVersion 5.2.2 -Force -Global -PassThru
+              Import-Module Pester -Force -Global -PassThru
           }
           
           # Execute all tests
-          $testScriptsPath = "$PSScriptRoot/Weather.Cmdlets.Tests/Pester"
+          $testScriptsPath = "Weather.Cmdlets.Tests/Pester"
       
           # Create the test results file
-          $testResultsFile = "$PSScriptRoot/Weather.Cmdlets.Tests/TEST-Results.Pester.xml"
+          $testResultsFile = "Weather.Cmdlets.Tests/TEST-Results.Pester.xml"
       
           if (Test-Path $testResultsFile) {
               Remove-Item -Path $testResultsFile
