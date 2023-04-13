@@ -281,6 +281,6 @@ jobs:
           $APIKey = "5d8d8afa-e399-4cb4-965e-edab5944268e"
 
           # Publish the module the the SkyKick MyGet PowerShell feed
-          $ModulePath = "Weather.Cmdlets/Release/net6.0"
+          $ModulePath = "Weather.Cmdlets/bin/Release/net6.0"
           Register-PSRepository -Name $FeedName -SourceLocation $PSGallerySourceUri -PublishLocation $PSGalleryPublishUri
           Publish-Module -Path $ModulePath -NuGetApiKey $APIKey -Repository $FeedName -Verbose
