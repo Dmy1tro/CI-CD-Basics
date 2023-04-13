@@ -257,7 +257,7 @@ jobs:
         run: dotnet nuget push "Weather.Shared/package_artifacts/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 
   release-myget-package:
-    needs: [run-pester-tests]
+    needs: [run-pester-tests, run-powershell-tests]
     runs-on: ubuntu-latest
     environment:
       name: 'myget-release'
@@ -276,8 +276,8 @@ jobs:
         run: |
           Import-Module PowerShellGet
           $FeedName = "ci-cd-basics-packages"
-          $PSGalleryPublishUri = 'https://www.myget.org/F/$FeedName/api/v2/package'
-          $PSGallerySourceUri = 'https://www.myget.org/F/$FeedName/api/v2'
+          $PSGalleryPublishUri = "https://www.myget.org/F/$FeedName/api/v2/package"
+          $PSGallerySourceUri = "https://www.myget.org/F/$FeedName/api/v2"
           $APIKey = "5d8d8afa-e399-4cb4-965e-edab5944268e"
 
           # Publish the module the the SkyKick MyGet PowerShell feed
