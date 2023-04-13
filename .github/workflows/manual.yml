@@ -280,7 +280,11 @@ jobs:
           $PSGallerySourceUri = "https://www.myget.org/F/$FeedName/api/v2"
           $APIKey = "5d8d8afa-e399-4cb4-965e-edab5944268e"
 
+          # Create folder with module name and copy all files
+          $ModulePath = "Weather.Cmdlets/bin/WeatherCmdlets"
+          $ReleasePath = "Weather.Cmdlets/bin/Release/net6.0"
+          Get-ChildItem -Path $ReleasePath -Force | Copy-Item -Destination $ModulePath
+
           # Publish the module the the SkyKick MyGet PowerShell feed
-          $ModulePath = "Weather.Cmdlets/bin/Release/net6.0"
           Register-PSRepository -Name $FeedName -SourceLocation $PSGallerySourceUri -PublishLocation $PSGalleryPublishUri
           Publish-Module -Path $ModulePath -NuGetApiKey $APIKey -Repository $FeedName -Verbose
