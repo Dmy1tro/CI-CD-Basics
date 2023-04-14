@@ -276,15 +276,15 @@ jobs:
         run: |
           Import-Module PowerShellGet
           $FeedName = "ci-cd-basics-packages"
-          $PSGalleryPublishUri = "https://www.myget.org/F/$FeedName/api/v2/package"
-          $PSGallerySourceUri = "https://www.myget.org/F/$FeedName/api/v2"
           $APIKey = "5d8d8afa-e399-4cb4-965e-edab5944268e"
-
+          $PSGalleryPublishUri = "https://www.myget.org/F/$FeedName/api/v2/package"
+          $PSGallerySourceUri = "https://www.myget.org/F/$FeedName/auth/$APIKey/api/v2"
+          
           # Create folder with module name and copy all files
           $ModulePath = "Weather.Cmdlets/bin/WeatherCmdlets"
           $ReleasePath = "Weather.Cmdlets/bin/Release/net6.0"
           Copy-Item -Path $ReleasePath -Destination $ModulePath -Force -Recurse
 
           # Publish the module the the SkyKick MyGet PowerShell feed
-          Register-PSRepository -Name $FeedName -SourceLocation $PSGallerySourceUri -PublishLocation $PSGalleryPublishUri
-          Publish-Module -Path $ModulePath -NuGetApiKey $APIKey -Repository $FeedName -Verbose
+          Register-PSRepository -Name MyCustomWeatherFeed -SourceLocation $PSGallerySourceUri -PublishLocation $PSGalleryPublishUri
+          Publish-Module -Path $ModulePath -NuGetApiKey $APIKey -Repository MyCustomWeatherFeed -Verbose
