@@ -283,7 +283,7 @@ jobs:
           # Create folder with module name and copy all files
           $ModulePath = "Weather.Cmdlets/bin/WeatherCmdlets"
           $ReleasePath = "Weather.Cmdlets/bin/Release/net6.0"
-          Get-ChildItem -Path $ReleasePath -Force | Copy-Item -Destination $ModulePath
+          Copy-Item -Path $ReleasePath -Destination $ModulePath -Force -Recurse
 
           # Publish the module the the SkyKick MyGet PowerShell feed
           Register-PSRepository -Name $FeedName -SourceLocation $PSGallerySourceUri -PublishLocation $PSGalleryPublishUri
