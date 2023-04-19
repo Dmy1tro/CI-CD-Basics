@@ -293,7 +293,8 @@ jobs:
           $Manifest = Test-ModuleManifest -Path $ModulePath
           $CurrentVersion = $Manifest.Version
           $NewVersion = New-Object -TypeName System.Version -ArgumentList ($CurrentVersion.Major + 1), $CurrentVersion.Minor
-          Update-ModuleManifest -Path $ModuleFolder -ModuleVersion $NewVersion
+          Write-Host "New version - $NewVersion"
+          Update-ModuleManifest -Path $ModulePath -ModuleVersion $NewVersion
 
           # Publish the module the the SkyKick MyGet PowerShell feed
           Register-PSRepository -Name MyCustomWeatherFeed -SourceLocation $PSGallerySourceUri -PublishLocation $PSGalleryPublishUri
